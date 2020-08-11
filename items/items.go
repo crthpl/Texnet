@@ -34,10 +34,11 @@ func GiveItem(inv *[52]ItemStack, ite ItemStack) {
 	}
 }
 
-func CleanInv(inv *[52]ItemStack) {
+func CleanInv(inv [52]ItemStack) (ItemStack) {
 	for i:=0;i!=52;i++ {
 		if inv[i].amnt==0 {
 			inv[i].itype=0
 		}
 	}
+	return inv
 }

@@ -5,8 +5,8 @@ import (
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/pixelgl"
 	//"github.com/faiface/pixel/text"
-	"github.com/CrazyDiamond88/Texnet/packets"
-	"github.com/CrazyDiamond88/Texnet/items"
+	"github.com/theoo3/Texnet/packets"
+	"github.com/theoo3/Texnet/items"
 	"golang.org/x/image/colornames"
 	"image"
 	_ "image/png"
@@ -21,6 +21,12 @@ import (
 type Player struct {
 	x, y int
 	used bool
+}
+
+type ItemStack struct {
+	amnt int8		//can be at most 85 (legally) and at the least 1
+	itype int32		//allows for four billion different types of items/blocks
+	//nbt string	// unused (for now!)
 }
 
 func loadPicture(path string) (pixel.Picture, error) {
@@ -117,7 +123,7 @@ func run() {
 	var youID int
 	randAngles := [4]float64{0, 1.5708, 3.14159, 4.71239}
 	rand.Seed(time.Now().UnixNano())
-	var inv [52]items.ItemStack	//in order: 10 hotbar slots, 30 inv slots, 4 armor slots, 8 misceloanous bauble slots, 1 error slot
+	var inv [52]ItemStack	//in order: 10 hotbar slots, 30 inv slots, 4 armor slots, 8 misceloanous bauble slots, 1 error slot
 	
 	grasses.Clear()
 	for x := 16; x != 656; x += 32 {
@@ -238,7 +244,7 @@ func run() {
 		}
 
 		//removing itemStacks with 0 items from the inv
-		items.CleanInv(&inv)
+		inv = items.CleanInv(inv)
 
 		//drawing everything
 		win.Clear(colornames.Forestgreen)
