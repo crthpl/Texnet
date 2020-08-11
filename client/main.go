@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/pixelgl"
+	//"github.com/faiface/pixel/text"
 	"golang.org/x/image/colornames"
 	"image"
 	_ "image/png"
@@ -80,6 +81,11 @@ func run() {
 	youSpr := pixel.NewSprite(you, you.Bounds())
 	invs := pixel.NewBatch(&pixel.TrianglesData{}, inv)
 	invSpr := pixel.NewSprite(inv, inv.Bounds())
+	//da text
+	//atlas := text.NewAtlas(
+	//	basicfont.Face7x13,
+	//	[]rune{'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'},
+	//)
 
 	//BEGIN NETWORKING STUFF
 	go func() {
@@ -116,7 +122,7 @@ func run() {
 	randAngles := [4]float64{0, 1.5708, 3.14159, 4.71239}
 	rand.Seed(time.Now().UnixNano())
 	var inventory [52]ItemStack	//in order: 10 hotbar slots, 30 inventory slots, 4 armor slots, 8 misceloanous bauble slots, 1 error slot
-	inventory[1] = ItemStack{1, 1}
+	
 	grasses.Clear()
 	for x := 16; x != 656; x += 32 {
 		for y := 80; y != 720; y += 32 {
@@ -130,49 +136,49 @@ func run() {
 		//dt := time.Since(last).Seconds()
 		//last = time.Now()
 
-		// placing/breaking
+		// all da controls
 		if win.JustPressed(pixelgl.KeyUp) {
-			SendPacket(c, "PLCB "+strconv.Itoa(pls[youID].x)+" "+strconv.Itoa(pls[youID].y+1)+"\n")
+			SendPacket(c, "PLCB "+strconv.Itoa(pls[youID].x)+" "+strconv.Itoa(pls[youID].y+1)+" 0\n")
 		}
 		if win.JustPressed(pixelgl.KeyDown) {
-			SendPacket(c, "PLCB "+strconv.Itoa(pls[youID].x)+" "+strconv.Itoa(pls[youID].y-1)+"\n")
+			SendPacket(c, "PLCB "+strconv.Itoa(pls[youID].x)+" "+strconv.Itoa(pls[youID].y-1)+" 0\n")
 		}
 		if win.JustPressed(pixelgl.KeyRight) {
-			SendPacket(c, "PLCB "+strconv.Itoa(pls[youID].x+1)+" "+strconv.Itoa(pls[youID].y)+"\n")
+			SendPacket(c, "PLCB "+strconv.Itoa(pls[youID].x+1)+" "+strconv.Itoa(pls[youID].y)+" 0\n")
 		}
 		if win.JustPressed(pixelgl.KeyLeft) {
-			SendPacket(c, "PLCB "+strconv.Itoa(pls[youID].x-1)+" "+strconv.Itoa(pls[youID].y)+"\n")
+			SendPacket(c, "PLCB "+strconv.Itoa(pls[youID].x-1)+" "+strconv.Itoa(pls[youID].y)+" 0\n")
 		}
 		//selecting slots
 		if win.JustPressed(pixelgl.Key1) {
-			selSlot = 0
+			SendPacket(c, "SLSL 0 " + strconv.Itoa(youID) + "\n")
 		}
 		if win.JustPressed(pixelgl.Key2) {
-			selSlot = 1
+			SendPacket(c, "SLSL 1 " + strconv.Itoa(youID) + "\n")
 		}
 		if win.JustPressed(pixelgl.Key3) {
-			selSlot = 2
+			SendPacket(c, "SLSL 2 " + strconv.Itoa(youID) + "\n")
 		}
 		if win.JustPressed(pixelgl.Key4) {
-			selSlot = 3
+			SendPacket(c, "SLSL 3 " + strconv.Itoa(youID) + "\n")
 		}
 		if win.JustPressed(pixelgl.Key5) {
-			selSlot = 4
+			SendPacket(c, "SLSL 4 " + strconv.Itoa(youID) + "\n")
 		}
 		if win.JustPressed(pixelgl.Key6) {
-			selSlot = 5
+			SendPacket(c, "SLSL 5 " + strconv.Itoa(youID) + "\n")
 		}
 		if win.JustPressed(pixelgl.Key7) {
-			selSlot = 6
+			SendPacket(c, "SLSL 6 " + strconv.Itoa(youID) + "\n")
 		}
 		if win.JustPressed(pixelgl.Key8) {
-			selSlot = 7
+			SendPacket(c, "SLSL 7 " + strconv.Itoa(youID) + "\n")
 		}
 		if win.JustPressed(pixelgl.Key9) {
-			selSlot = 8
+			SendPacket(c, "SLSL 8 " + strconv.Itoa(youID) + "\n")
 		}
 		if win.JustPressed(pixelgl.Key0) {
-			selSlot = 9
+			SendPacket(c, "SLSL 9 " + strconv.Itoa(youID) + "\n")
 		}
 		//moving
 		if win.JustPressed(pixelgl.KeyW) {
@@ -219,17 +225,26 @@ func run() {
 			}
 		}
 		invs.Clear()
+		invTiles.Clear()
 		for x := 32; x != 672; x += 64 {
 			if (x+32)/64==selSlot+1 {
-				invSpr.Draw(invs, pixel.IM.Moved(pixel.V(float64(x), float64(32))).ScaledXY(pixel.V(float64(x), float64(32)), pixel.V(4.4, 4.4)))
+				invSpr.Draw(invs, pixel.IM.Moved(pixel.V(float64(x), float64(32))).ScaledXY(pixel.V(float64(x), float64(32)), pixel.V(4.6, 4.6)))
 			} else {
 				invSpr.Draw(invs, pixel.IM.Moved(pixel.V(float64(x), float64(32))).ScaledXY(pixel.V(float64(x), float64(32)), pixel.V(4, 4)))
 			}
-			switch inventory[selSlot].itype {
+			switch inventory[(x+32)/64-1].itype {
 			case 0:
-			
 			case 1:
 				tileSpr.Draw(invTiles, pixel.IM.Moved(pixel.V(float64(x), 32)).ScaledXY(pixel.V(float64(x), 32), pixel.V(2.3, 2.3)))
+			default:
+				//fmt.Println(in(x+32)/64-1)
+			}
+		}
+
+		//removing itemStacks with 0 items from the inventory
+		for i:=0;i!=52;i++ {
+			if inventory[i].amnt==0 {
+				inventory[i].itype=0
 			}
 		}
 
@@ -251,31 +266,47 @@ func run() {
 			pktType, pktData := DecodePacket(packet)
 			fmt.Print(packet)
 			switch pktType {
-			case "CHAT":
+			case "CHAT": //someone said something (Message)
 				fmt.Print(strings.Join(pktData, " "))
-			case "PLCB":
+			case "PLCB": //someone placed a block (Position)
 				x, _ := strconv.Atoi(pktData[0])
-				y, _ := strconv.Atoi(RemoveNewline(pktData[1]))
-				if x >= 20 {
-					x = 20
+				y, _ := strconv.Atoi(pktData[1])
+				ini, _ := strconv.Atoi(RemoveNewline(pktData[2]))
+				if inventory[selSlot].amnt != 0 {
+					dis:=false
+					if x >= 20 {
+						dis=true
+					}
+					if x < 0 {
+						dis=true
+					}
+					if y >= 20 {
+						dis=true
+					}
+					if y < 0 {
+						dis=true
+					}
+					if !dis {
+						tileSpr.Draw(tiles, pixel.IM.Moved(pixel.V(float64(x*32), float64(y*32))).ScaledXY(pixel.V(float64(x*32), float64(y*32)), pixel.V(2, 2)))
+						switch tilePos[x][y] {
+						case 1:
+							tilePos[x][y] = 0
+							if ini==0 {
+								inventory[selSlot].amnt++
+							}
+						case 0:
+							tilePos[x][y] = 1
+							if ini==0 {
+								inventory[selSlot].amnt--
+							}
+						}
+					}
+				} else {
+					if tilePos[x][y]>0 {
+						inventory[selSlot].amnt++
+					}
 				}
-				if x <= 0 {
-					x = 0
-				}
-				if y >= 20 {
-					y = 20
-				}
-				if y <= 0 {
-					y = 0
-				}
-				tileSpr.Draw(tiles, pixel.IM.Moved(pixel.V(float64(x*32), float64(y*32))).ScaledXY(pixel.V(float64(x*32), float64(y*32)), pixel.V(2, 2)))
-				switch tilePos[x][y] {
-				case 1:
-					tilePos[x][y] = 0
-				case 0:
-					tilePos[x][y] = 1
-				}
-			case "MOVE":
+			case "MOVE": //someone moves (direction ID)
 				id, err := strconv.Atoi(RemoveNewline(pktData[1]))
 				if err!=nil {
 					panic(err)
@@ -290,7 +321,7 @@ func run() {
 				case "W":
 					pls[id].x = pls[id].x - 1
 				}
-			case "SPWN":
+			case "SPWN": //new player spawns (position, id)
 				x, err := strconv.Atoi(pktData[0])
 				y, err := strconv.Atoi(pktData[1])
 				id, err := strconv.Atoi(RemoveNewline(pktData[2]))
@@ -298,7 +329,7 @@ func run() {
 					panic(err)
 				}
 				pls[id] = Player{x, y, true}
-			case "YOUI":
+			case "YOUI": //your id is: (ID)
 				youID, err = strconv.Atoi(RemoveNewline(pktData[0]))
 				if err!=nil {
 					panic(err)
@@ -306,12 +337,36 @@ func run() {
 				if !pls[youID].used {
 					pls[youID] = Player{10, 10, true}
 				}
-			case "DISC":
+			case "DISC": //disconnect (playerID)
 				id, err := strconv.Atoi(RemoveNewline(pktData[0]))
 				if err!=nil {
 					panic(err)
 				}
 				pls[id] = Player{0, 0, false}
+			case "INVC": // inventory change (ID, slot, amount, type)
+				id, err:=strconv.Atoi(pktData[0])
+				if id==youID {
+					slot, err := strconv.Atoi(pktData[1])
+					amount, err := strconv.Atoi(pktData[2])
+					itemType, err := strconv.Atoi(RemoveNewline(pktData[3]))
+					inventory[slot].amnt = int8(amount)
+					inventory[slot].itype = int32(itemType)
+					if err!=nil {
+						panic(err)
+					}
+				}
+				if err!=nil {
+					panic(err)
+				}
+			case "SLSL": // selected slot (slot, IF)
+				id, err := strconv.Atoi(RemoveNewline(pktData[1]))
+				fmt.Println(id)
+				if id==youID {
+					selSlot, err = strconv.Atoi(pktData[0])
+				}
+				if err!=nil {
+					panic(err)
+				}
 			}
 			
 		default:

@@ -17,6 +17,17 @@ type Player struct {
 	x, y int
 	id int
 	used bool
+	selSlot int
+}
+
+type ItemStack struct {
+	amnt int8		//can be at most 85 (legally) and at the least 1
+	itype int32		//allows for four billion different types of items
+	//nbt string	// unused (for now!)
+}
+
+type Inventory struct {
+	inv [52]ItemStack
 }
 
 func SendPacket(c net.Conn, packet string) {
@@ -29,6 +40,7 @@ func SendPacket(c net.Conn, packet string) {
 func main() {
 	clientCount := 0
 	allClients := make(map[net.Conn]int)
+	//inventories := make(map[Player]Inventory)
 	newConnections := make(chan net.Conn)
 	deadConnections := make(chan net.Conn)
 	var pls [10002]Player
@@ -66,21 +78,27 @@ func main() {
 					time.Sleep(time.Millisecond*50)
 				}
 			}
-			
-			pls[Tid] = Player{10, 10, Tid, true}
+			/*for i:=0;i!=52;i++ {
+				if inventory[i].amnt==0 {
+					inventory[i].itype=0
+				}
+			}*/		
+			pls[Tid] = Player{10, 10, Tid, true, 0}
 			paket := "SPWN 10 10 " + strconv.Itoa(Tid) + "\n"
 			for conn, _ := range allClients {
 				time.Sleep(time.Millisecond*30)
 				go SendPacket(conn, paket)
 			}
-			
+
+			time.Sleep(time.Millisecond*100)
+			SendPacket(conn, "YOUI " + strconv.Itoa(Tid) + "\n")
+			time.Sleep(time.Millisecond*100)
+			SendPacket(conn, "INVC " + strconv.Itoa(Tid) + " 5 4 1\n")
 			time.Sleep(time.Millisecond*500)
-			paket = "YOUI " + strconv.Itoa(Tid) + "\n"
-			SendPacket(conn, paket)
 			for x:=0;x!=21;x++ {
 				for y:=0;y!=21;y++ {
 					if tiles[x][y] == 1 {
-						_, err := conn.Write([]byte(fmt.Sprintf("TILE %v %v\n", x, y)))
+						_, err := conn.Write([]byte(fmt.Sprintf("PLCB %v %v 1\n", x, y)))
 						if err != nil {
 							deadConnections <- conn
 						}
@@ -112,29 +130,32 @@ func main() {
 			//log.Printf("New packet: %s", packet)
 			pktSit := strings.Split(packet, " ")
 			switch pktSit[0] {
-			case "TILE":
+			case "PLCB":
 				x, err:=strconv.Atoi(pktSit[1])
-				y, err:=strconv.Atoi(pktSit[2][:len(pktSit[2])-1])
+				y, err:=strconv.Atoi(pktSit[2])
+				dis:=false
 				if err!=nil {
 					panic(err)
 				}
 				if x>=20 {
-					x=20
+					dis=true
 				}
-				if x<=0 {
-					x=0
+				if x<=-2 {
+					dis=true
 				}
 				if y>=20 {
-					y=20
+					dis=true
 				}
-				if y<=0 {
-					y=0
+				if y<=-2 {
+					dis=true
 				}
-				switch tiles[x][y] {
-				case 1:
-					tiles[x][y] = 0
-				case 0:
-					tiles[x][y] = 1
+				if !dis {
+					switch tiles[x][y] {
+					case 1:
+						tiles[x][y] = 0
+					case 0:
+						tiles[x][y] = 1
+					}
 				}
 			case "MOVE":
 				id, err := strconv.Atoi(strings.Split(pktSit[2], "\n")[0])
@@ -156,9 +177,10 @@ func main() {
 			//log.Printf("Broadcast to %d clients", len(allClients))
 		case conn := <-deadConnections:
 			log.Printf("Client %d disconnected", allClients[conn])
-			pls[allClients[conn]] = Player{0, 0, 9997, false}
+			id := pls[allClients[conn]].id
+			pls[allClients[conn]] = Player{0, 0, 9997, false, 0}
 			for conn, _ := range allClients {
-				go SendPacket(conn, "DISC "+strconv.Itoa(allClients[conn])+"\n")
+				go SendPacket(conn, "DISC "+strconv.Itoa(id)+"\n")
 			}
 			delete(allClients, conn)
 		}
