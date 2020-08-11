@@ -9,7 +9,7 @@ import (
 	"github.com/theoo3/Texnet/items"
 	"github.com/theoo3/Texnet/loadfiles"
 	"golang.org/x/image/colornames"
-	"golang.org/x/image/font/basicfont"
+	//"golang.org/x/image/font/basicfont"
 	"math/rand"
 	"net"
 	"os"
@@ -66,8 +66,11 @@ func run() {
 	invs := pixel.NewBatch(&pixel.TrianglesData{}, invp)
 	invSpr := pixel.NewSprite(invp, invp.Bounds())
 	//da text
-	face, err := loadfiles.loadTTF("xolonium.ttf", 80)
-	atlas := text.NewAtlas(basicfont.Face7x13, []rune{'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'})
+	face, err := loadfiles.LoadTTF("xolonium.ttf", 80)
+	if err != nil {
+		panic(err)
+	}
+	atlas := text.NewAtlas(face, []rune{'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'})
 	basicTxt := text.New(pixel.V(30, 10), atlas)
 	fmt.Fprintln(basicTxt, "123456789")
 

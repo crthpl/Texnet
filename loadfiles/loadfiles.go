@@ -28,6 +28,8 @@ func LoadPicture(path string) (pixel.Picture, error) {
 
 
 func LoadTTF(path string, size float64) (font.Face, error) {
+	curPath, err :=osext.ExecutableFolder()
+	path = curPath+"/assets/"+path
 	file, err := os.Open(path)
 	if err != nil {
 		return nil, err
