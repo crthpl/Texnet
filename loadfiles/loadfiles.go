@@ -7,6 +7,8 @@ import (
 	_ "image/png"
 	"github.com/kardianos/osext"
 	"github.com/golang/freetype/truetype"
+	"golang.org/x/image/font"
+	"io/ioutil"
 )
 
 func LoadPicture(path string) (pixel.Picture, error) {
