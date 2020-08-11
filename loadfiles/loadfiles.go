@@ -8,16 +8,17 @@ import (
 	"github.com/kardianos/osext"
 )
 
-func LoadPicture(path string) (pixel.Picture, error, string) {
-	path = osext.ExecutableFolder()+"/assets/"+path
+func LoadPicture(path string) (pixel.Picture, error) {
+	path, err = osext.ExecutableFolder()+"/assets/"+path
+	fmt.Println(path)
 	file, err := os.Open(path)
 	if err != nil {
-		return nil, err, osext.ExecutableFolder()
+		return nil, err
 	}
 	defer file.Close()
 	img, _, err := image.Decode(file)
 	if err != nil {
-		return nil, err, osext.ExecutableFolder()
+		return nil, err
 	}
-	return pixel.PictureDataFromImage(img), nil, osext.ExecutableFolder()
+	return pixel.PictureDataFromImage(img), nil
 }
