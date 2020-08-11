@@ -4,10 +4,12 @@ import (
 	"fmt"
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/pixelgl"
-	//"github.com/faiface/pixel/text"
+	"github.com/faiface/pixel/text"
 	"github.com/theoo3/Texnet/packets"
 	"github.com/theoo3/Texnet/items"
+	"github.com/theoo3/Texnet/loadfiles"
 	"golang.org/x/image/colornames"
+	"golang.org/x/image/font/basicfont"
 	"image"
 	_ "image/png"
 	"math/rand"
@@ -23,19 +25,6 @@ type Player struct {
 	used bool
 }
 
-func loadPicture(path string) (pixel.Picture, error) {
-	file, err := os.Open(path)
-	if err != nil {
-		return nil, err
-	}
-	defer file.Close()
-	img, _, err := image.Decode(file)
-	if err != nil {
-		return nil, err
-	}
-	return pixel.PictureDataFromImage(img), nil
-}
-
 func run() {
 	contOut := make(chan bool)
 	contIn := make(chan bool)
@@ -43,7 +32,7 @@ func run() {
 	//BEGIN NETWORKING CONNECTING
 	fmt.Print("\n\n\nPlease Enter Server IP ----------------------------------------------------------->")
 	host := packets.ReadUserInput()
-	if host == "l\n" { // if the user type l, it is localhost
+	if host == "l\n" { // if the user types l, it is localhost
 		host = "localhost\n"
 	}
 	host = host[:len(host)-1]
@@ -61,10 +50,10 @@ func run() {
 		panic(err)
 	}
 
-	grass, err := loadPicture("grass.png")	//loading the grass tile
-	tile, err := loadPicture("wood.png")	//loading the tile tile
-	you, err := loadPicture("you.png")		//loading you
-	invp, err := loadPicture("inv.png")		//loading the inv hotbar slors
+	grass, err := Loadfiles.LoadPicture("grass.png")	//loading the grass tile
+	tile, err := Loadfiles.LoadPicture("wood.png")	//loading the tile tile
+	you, err := Loadfiles.LoadPicture("you.png")		//loading you
+	invp, err := Loadfiles.LoadPicture("inv.png")		//loading the inv hotbar slors
 	if err != nil {
 		panic(err)
 	}
@@ -78,10 +67,12 @@ func run() {
 	invs := pixel.NewBatch(&pixel.TrianglesData{}, invp)
 	invSpr := pixel.NewSprite(invp, invp.Bounds())
 	//da text
-	//atlas := text.NewAtlas(
-	//	basicfont.Face7x13,
-	//	[]rune{'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'},
-	//)
+	atlas := text.NewAtlas(basicfont.Face7x13, []rune{'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'})
+	basicTxt := text.New(pixel.V(100, 100), atlas)
+	fmt.Fprintln(basicTxt, "123456789")
+
+
+
 	//BEGIN NETWORKING STUFF
 	go func() {
 		for {
@@ -124,8 +115,6 @@ func run() {
 			grassSpr.Draw(grasses, pixel.IM.Moved(pixel.V(float64(x), float64(y))).ScaledXY(pixel.V(float64(x), float64(y)), pixel.V(2, 2)).Rotated(pixel.V(float64(x), float64(y)), randAngles[rand.Intn(3)]))
 		}
 	}
-	grasses.Draw(win)
-
 	//last := time.Now()
 	for !win.Closed() {
 		//dt := time.Since(last).Seconds()
@@ -246,7 +235,9 @@ func run() {
 		yous.Draw(win)
 		invs.Draw(win)
 		invTiles.Draw(win)
+		basicTxt.Draw(win, pixel.IM.Scaled(basicTxt.Orig, 2))
 		win.Update()
+		
 
 		frames++ //Fps displaying stuff
 		select {
