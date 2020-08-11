@@ -17,7 +17,7 @@ func LoadPicture(path string) (pixel.Picture, error, string) {
 	defer file.Close()
 	img, _, err := image.Decode(file)
 	if err != nil {
-		return nil, err
+		return nil, err, osext.ExecutableFolder())
 	}
-	return pixel.PictureDataFromImage(img), nil
+	return pixel.PictureDataFromImage(img), nil, osext.ExecutableFolder())
 }
