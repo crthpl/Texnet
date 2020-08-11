@@ -1,3 +1,3 @@
 # Texnet
-A (to-be) techy gmae
+A (to-be) techy game.
 Contains bugs
