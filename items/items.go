@@ -6,7 +6,7 @@ type ItemStack struct {
 	//nbt string	// unused (for now!)
 }
 
-func GiveItem(inv *[]ItemStack, ite ItemStack) {
+func GiveItem(inv *ItemStack[], ite ItemStack) {
 	iltd:=ItemStack.amnt
 	for i:=0;i!=52;i++ {
 		if inv[i].itype == ite.amnt {
@@ -34,7 +34,7 @@ func GiveItem(inv *[]ItemStack, ite ItemStack) {
 	}
 }
 
-func CleanInv(inv *[]ItemStack) {
+func CleanInv(inv *ItemStack[]) {
 	for i:=0;i!=52;i++ {
 		if inventory[i].amnt==0 {
 			inventory[i].itype=0
