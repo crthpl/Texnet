@@ -64,7 +64,7 @@ func run() {
 	grass, err := loadPicture("grass.png")	//loading the grass tile
 	tile, err := loadPicture("wood.png")	//loading the tile tile
 	you, err := loadPicture("you.png")		//loading you
-	inv, err := loadPicture("inv.png")		//loading the inv hotbar slors
+	invp, err := loadPicture("inv.png")		//loading the inv hotbar slors
 	if err != nil {
 		panic(err)
 	}
@@ -75,8 +75,8 @@ func run() {
 	tileSpr := pixel.NewSprite(tile, tile.Bounds())
 	yous := pixel.NewBatch(&pixel.TrianglesData{}, you)
 	youSpr := pixel.NewSprite(you, you.Bounds())
-	invs := pixel.NewBatch(&pixel.TrianglesData{}, inv)
-	invSpr := pixel.NewSprite(inv, inv.Bounds())
+	invs := pixel.NewBatch(&pixel.TrianglesData{}, invp)
+	invSpr := pixel.NewSprite(invp, invp.Bounds())
 	//da text
 	//atlas := text.NewAtlas(
 	//	basicfont.Face7x13,
@@ -292,7 +292,7 @@ func run() {
 						}
 					}
 				} else {
-					if tilePos[x][y]>0&&ini=0 {
+					if tilePos[x][y]>0&&ini==0 {
 						inv[selSlot].amnt++
 					}
 				}
