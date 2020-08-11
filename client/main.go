@@ -47,15 +47,15 @@ func run() {
 	if err != nil {
 		panic(err)
 	}
-
+	//load the images from the disc
 	grass, err := loadfiles.LoadPicture("grass.png")	//loading the grass tile
 	tile, err := loadfiles.LoadPicture("wood.png")	//loading the tile tile
 	you, err := loadfiles.LoadPicture("you.png")		//loading you
 	invp, err := loadfiles.LoadPicture("inv.png")	//loading the inv hotbar slors
-
 	if err != nil {
 		panic(err)
 	}
+	// make the graphics batches and sprites
 	grasses := pixel.NewBatch(&pixel.TrianglesData{}, grass)
 	grassSpr := pixel.NewSprite(grass, grass.Bounds())
 	tiles := pixel.NewBatch(&pixel.TrianglesData{}, tile)
@@ -66,8 +66,9 @@ func run() {
 	invs := pixel.NewBatch(&pixel.TrianglesData{}, invp)
 	invSpr := pixel.NewSprite(invp, invp.Bounds())
 	//da text
+	face, err := loadfiles.loadTTF("xolonium.ttf", 80)
 	atlas := text.NewAtlas(basicfont.Face7x13, []rune{'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'})
-	basicTxt := text.New(pixel.V(100, 100), atlas)
+	basicTxt := text.New(pixel.V(30, 10), atlas)
 	fmt.Fprintln(basicTxt, "123456789")
 
 
