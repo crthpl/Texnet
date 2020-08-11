@@ -47,13 +47,13 @@ func run() {
 	pktReceive := make(chan string)
 	//BEGIN NETWORKING CONNECTING
 	fmt.Print("\n\n\nPlease Enter Server IP ----------------------------------------------------------->")
-	host := ReadUserInput()
+	host := packets.ReadUserInput()
 	if host == "l\n" { // if the user type l, it is localhost
 		host = "localhost\n"
 	}
 	host = host[:len(host)-1]
 	host = host + ":61435"
-	c := StartConnection(host) //connect to the server
+	c := packets.StartConnection(host) //connect to the server
 	//END NETWORKING CONNECTING
 	cfg := pixelgl.WindowConfig{ //the settings for the window
 		Title:  "Online Game",
@@ -93,15 +93,15 @@ func run() {
 		for {
 			go func(c net.Conn) {
 				for {
-					incoming := RecievePackets(c)
+					incoming := packets.RecievePackets(c)
 					pktReceive <- incoming
 				}
 			}(c)
 
 			go func() {
 				for {
-					outComing := ReadUserInput()
-					SendChat(c, outComing)
+					outComing := packets.ReadUserInput()
+					packets.SendChat(c, outComing)
 					contOut <- true
 				}
 			}()
@@ -152,61 +152,61 @@ func run() {
 		}
 		//selecting slots
 		if win.JustPressed(pixelgl.Key1) {
-			SendPacket(c, "SLSL 0 " + strconv.Itoa(youID) + "\n")
+			packets.SendPacket(c, "SLSL 0 " + strconv.Itoa(youID) + "\n")
 		}
 		if win.JustPressed(pixelgl.Key2) {
-			SendPacket(c, "SLSL 1 " + strconv.Itoa(youID) + "\n")
+			packets.SendPacket(c, "SLSL 1 " + strconv.Itoa(youID) + "\n")
 		}
 		if win.JustPressed(pixelgl.Key3) {
-			SendPacket(c, "SLSL 2 " + strconv.Itoa(youID) + "\n")
+			packets.SendPacket(c, "SLSL 2 " + strconv.Itoa(youID) + "\n")
 		}
 		if win.JustPressed(pixelgl.Key4) {
-			SendPacket(c, "SLSL 3 " + strconv.Itoa(youID) + "\n")
+			packets.SendPacket(c, "SLSL 3 " + strconv.Itoa(youID) + "\n")
 		}
 		if win.JustPressed(pixelgl.Key5) {
-			SendPacket(c, "SLSL 4 " + strconv.Itoa(youID) + "\n")
+			packets.SendPacket(c, "SLSL 4 " + strconv.Itoa(youID) + "\n")
 		}
 		if win.JustPressed(pixelgl.Key6) {
-			SendPacket(c, "SLSL 5 " + strconv.Itoa(youID) + "\n")
+			packets.SendPacket(c, "SLSL 5 " + strconv.Itoa(youID) + "\n")
 		}
 		if win.JustPressed(pixelgl.Key7) {
-			SendPacket(c, "SLSL 6 " + strconv.Itoa(youID) + "\n")
+			packets.SendPacket(c, "SLSL 6 " + strconv.Itoa(youID) + "\n")
 		}
 		if win.JustPressed(pixelgl.Key8) {
-			SendPacket(c, "SLSL 7 " + strconv.Itoa(youID) + "\n")
+			packets.packets.SendPacket(c, "SLSL 7 " + strconv.Itoa(youID) + "\n")
 		}
 		if win.JustPressed(pixelgl.Key9) {
-			SendPacket(c, "SLSL 8 " + strconv.Itoa(youID) + "\n")
+			packets.SendPacket(c, "SLSL 8 " + strconv.Itoa(youID) + "\n")
 		}
 		if win.JustPressed(pixelgl.Key0) {
-			SendPacket(c, "SLSL 9 " + strconv.Itoa(youID) + "\n")
+			packets.SendPacket(c, "SLSL 9 " + strconv.Itoa(youID) + "\n")
 		}
 		//moving
 		if win.JustPressed(pixelgl.KeyW) {
 			if pls[youID].y!=19 {
 				if tilePos[pls[youID].x][pls[youID].y+1] == 0 {
-					SendPacket(c, "MOVE N " + strconv.Itoa(youID)+"\n")
+					packets.SendPacket(c, "MOVE N " + strconv.Itoa(youID)+"\n")
 				}
 			}
 		}
 		if win.JustPressed(pixelgl.KeyA) {
 			if pls[youID].x!=0 {
 				if tilePos[pls[youID].x-1][pls[youID].y] == 0 {
-					SendPacket(c, "MOVE W " + strconv.Itoa(youID)+"\n")
+					packets.SendPacket(c, "MOVE W " + strconv.Itoa(youID)+"\n")
 				}
 			}
 		}
 		if win.JustPressed(pixelgl.KeyS) {
 			if pls[youID].y!=0 {
 				if tilePos[pls[youID].x][pls[youID].y-1] == 0 {
-					SendPacket(c, "MOVE S " + strconv.Itoa(youID)+"\n")
+					packets.SendPacket(c, "MOVE S " + strconv.Itoa(youID)+"\n")
 				}
 			}
 		}
 		if win.JustPressed(pixelgl.KeyD) {
 			if pls[youID].x!=19 {
 				if tilePos[pls[youID].x+1][pls[youID].y] == 0 {
-					SendPacket(c, "MOVE E " + strconv.Itoa(youID)+"\n")
+					packets.SendPacket(c, "MOVE E " + strconv.Itoa(youID)+"\n")
 				}
 			}
 		}
@@ -264,7 +264,7 @@ func run() {
 			win.SetTitle(fmt.Sprintf("%s | FPS: %d", cfg.Title, frames))
 			frames = 0 //End Fps displaying stuff
 		case packet := <-pktReceive:
-			pktType, pktData := DecodePacket(packet)
+			pktType, pktData := packets.DecodePacket(packet)
 			fmt.Print(packet)
 			switch pktType {
 			case "CHAT": //someone said something (Message)
@@ -308,7 +308,7 @@ func run() {
 					}
 				}
 			case "MOVE": //someone moves (direction ID)
-				id, err := strconv.Atoi(RemoveNewline(pktData[1]))
+				id, err := strconv.Atoi(packets.RemoveNewline(pktData[1]))
 				if err!=nil {
 					panic(err)
 				}
@@ -325,13 +325,13 @@ func run() {
 			case "SPWN": //new player spawns (position, id)
 				x, err := strconv.Atoi(pktData[0])
 				y, err := strconv.Atoi(pktData[1])
-				id, err := strconv.Atoi(RemoveNewline(pktData[2]))
+				id, err := strconv.Atoi(packets.RemoveNewline(pktData[2]))
 				if err!=nil {
 					panic(err)
 				}
 				pls[id] = Player{x, y, true}
 			case "YOUI": //your id is: (ID)
-				youID, err = strconv.Atoi(RemoveNewline(pktData[0]))
+				youID, err = strconv.Atoi(packets.RemoveNewline(pktData[0]))
 				if err!=nil {
 					panic(err)
 				}
@@ -339,7 +339,7 @@ func run() {
 					pls[youID] = Player{10, 10, true}
 				}
 			case "DISC": //disconnect (playerID)
-				id, err := strconv.Atoi(RemoveNewline(pktData[0]))
+				id, err := strconv.Atoi(packets.RemoveNewline(pktData[0]))
 				if err!=nil {
 					panic(err)
 				}
@@ -349,7 +349,7 @@ func run() {
 				if id==youID {
 					slot, err := strconv.Atoi(pktData[1])
 					amount, err := strconv.Atoi(pktData[2])
-					itemType, err := strconv.Atoi(RemoveNewline(pktData[3]))
+					itemType, err := strconv.Atoi(packets.RemoveNewline(pktData[3]))
 					inventory[slot].amnt = int8(amount)
 					inventory[slot].itype = int32(itemType)
 					if err!=nil {
@@ -360,7 +360,7 @@ func run() {
 					panic(err)
 				}
 			case "SLSL": // selected slot (slot, IF)
-				id, err := strconv.Atoi(RemoveNewline(pktData[1]))
+				id, err := strconv.Atoi(packets.RemoveNewline(pktData[1]))
 				fmt.Println(id)
 				if id==youID {
 					selSlot, err = strconv.Atoi(pktData[0])
