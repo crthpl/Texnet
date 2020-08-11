@@ -82,7 +82,6 @@ func run() {
 	//	basicfont.Face7x13,
 	//	[]rune{'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'},
 	//)
-
 	//BEGIN NETWORKING STUFF
 	go func() {
 		for {
