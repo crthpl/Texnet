@@ -7,7 +7,7 @@ type ItemStack struct {
 }
 
 func GiveItem(inv []*ItemStack, ite ItemStack) {
-	iltd:=ItemStack.amnt
+	iltd:=ite.amnt
 	for i:=0;i!=52;i++ {
 		if inv[i].itype == ite.itype {
 			isa:=85-inv[i].amnt
