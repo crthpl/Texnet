@@ -25,7 +25,7 @@ func LoadPicture(path string) (pixel.Picture, error) {
 }
 
 
-func loadTTF(path string, size float64) (font.Face, error) {
+func LoadTTF(path string, size float64) (font.Face, error) {
 	file, err := os.Open(path)
 	if err != nil {
 		return nil, err
