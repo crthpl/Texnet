@@ -5,10 +5,11 @@ import (
 	"github.com/faiface/pixel"
 	"image"
 	_ "image/png"
+	"github.com/kardianos/osext"
 )
 
 func LoadPicture(path string) (pixel.Picture, error) {
-	path = "/assets/"+path
+	path = osext.ExecutableFolder()+"/assets/"+path
 	file, err := os.Open(path)
 	if err != nil {
 		return nil, err

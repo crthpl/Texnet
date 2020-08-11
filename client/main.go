@@ -10,8 +10,6 @@ import (
 	"github.com/theoo3/Texnet/loadfiles"
 	"golang.org/x/image/colornames"
 	"golang.org/x/image/font/basicfont"
-	"image"
-	_ "image/png"
 	"math/rand"
 	"net"
 	"os"
@@ -50,10 +48,10 @@ func run() {
 		panic(err)
 	}
 
-	grass, err := Loadfiles.LoadPicture("grass.png")	//loading the grass tile
-	tile, err := Loadfiles.LoadPicture("wood.png")	//loading the tile tile
-	you, err := Loadfiles.LoadPicture("you.png")		//loading you
-	invp, err := Loadfiles.LoadPicture("inv.png")		//loading the inv hotbar slors
+	grass, err := loadfiles.LoadPicture("grass.png")	//loading the grass tile
+	tile, err := loadfiles.LoadPicture("wood.png")	//loading the tile tile
+	you, err := loadfiles.LoadPicture("you.png")		//loading you
+	invp, err := loadfiles.LoadPicture("inv.png")		//loading the inv hotbar slors
 	if err != nil {
 		panic(err)
 	}
