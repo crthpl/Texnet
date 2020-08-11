@@ -48,10 +48,14 @@ func run() {
 		panic(err)
 	}
 
-	grass, err := loadfiles.LoadPicture("grass.png")	//loading the grass tile
-	tile, err := loadfiles.LoadPicture("wood.png")	//loading the tile tile
-	you, err := loadfiles.LoadPicture("you.png")		//loading you
-	invp, err := loadfiles.LoadPicture("inv.png")		//loading the inv hotbar slors
+	grass, err, s := loadfiles.LoadPicture("grass.png")	//loading the grass tile
+	tile, err, t := loadfiles.LoadPicture("wood.png")	//loading the tile tile
+	you, err, u := loadfiles.LoadPicture("you.png")		//loading you
+	invp, err, v := loadfiles.LoadPicture("inv.png")	//loading the inv hotbar slors
+	fmt.Println(s)
+	fmt.Println(t)
+	fmt.Println(u)
+	fmt.Println(v)
 	if err != nil {
 		panic(err)
 	}
