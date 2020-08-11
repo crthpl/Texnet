@@ -4,12 +4,14 @@ import (
 	"os"
 	"github.com/faiface/pixel"
 	"image"
+	"fmt"
 	_ "image/png"
 	"github.com/kardianos/osext"
 )
 
 func LoadPicture(path string) (pixel.Picture, error) {
-	path, err = osext.ExecutableFolder()+"/assets/"+path
+	curPath, err :=osext.ExecutableFolder()
+	path = curPath+"/assets/"+path
 	fmt.Println(path)
 	file, err := os.Open(path)
 	if err != nil {
