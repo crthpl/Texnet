@@ -20,6 +20,12 @@ type Player struct {
 	used bool
 }
 
+type ItemStack struct {
+	amnt int8		//can be at most 85 (legally) and at the least 1
+	itype int32		//allows for four billion different types of items
+	//nbt string	// unused (for now!)
+}
+
 func loadPicture(path string) (pixel.Picture, error) {
 	file, err := os.Open(path)
 	if err != nil {
@@ -59,15 +65,16 @@ func run() {
 	}
 
 	grass, err := loadPicture("grass.png")	//loading the grass tile
-	tile, err := loadPicture("tile.png")	//loading the tile tile
+	tile, err := loadPicture("wood.png")	//loading the tile tile
 	you, err := loadPicture("you.png")		//loading you
-	inv, err := loadPicture("inv.png")		//loading the inventory slors
+	inv, err := loadPicture("inv.png")		//loading the inventory hotbar slors
 	if err != nil {
 		panic(err)
 	}
 	grasses := pixel.NewBatch(&pixel.TrianglesData{}, grass)
 	grassSpr := pixel.NewSprite(grass, grass.Bounds())
 	tiles := pixel.NewBatch(&pixel.TrianglesData{}, tile)
+	invTiles := pixel.NewBatch(&pixel.TrianglesData{}, tile)
 	tileSpr := pixel.NewSprite(tile, tile.Bounds())
 	yous := pixel.NewBatch(&pixel.TrianglesData{}, you)
 	youSpr := pixel.NewSprite(you, you.Bounds())
@@ -103,12 +110,13 @@ func run() {
 		second = time.Tick(time.Second)
 		selSlot = 0
 	)
-	var tilePos [21][21]int8
+	var tilePos [21][21]int32
 	var pls [10000]Player
 	var youID int
 	randAngles := [4]float64{0, 1.5708, 3.14159, 4.71239}
 	rand.Seed(time.Now().UnixNano())
-
+	var inventory [52]ItemStack	//in order: 10 hotbar slots, 30 inventory slots, 4 armor slots, 8 misceloanous bauble slots, 1 error slot
+	inventory[1] = ItemStack{1, 1}
 	grasses.Clear()
 	for x := 16; x != 656; x += 32 {
 		for y := 80; y != 720; y += 32 {
@@ -124,16 +132,16 @@ func run() {
 
 		// placing/breaking
 		if win.JustPressed(pixelgl.KeyUp) {
-			SendPacket(c, "TILE "+strconv.Itoa(pls[youID].x)+" "+strconv.Itoa(pls[youID].y+1)+"\n")
+			SendPacket(c, "PLCB "+strconv.Itoa(pls[youID].x)+" "+strconv.Itoa(pls[youID].y+1)+"\n")
 		}
 		if win.JustPressed(pixelgl.KeyDown) {
-			SendPacket(c, "TILE "+strconv.Itoa(pls[youID].x)+" "+strconv.Itoa(pls[youID].y-1)+"\n")
+			SendPacket(c, "PLCB "+strconv.Itoa(pls[youID].x)+" "+strconv.Itoa(pls[youID].y-1)+"\n")
 		}
 		if win.JustPressed(pixelgl.KeyRight) {
-			SendPacket(c, "TILE "+strconv.Itoa(pls[youID].x+1)+" "+strconv.Itoa(pls[youID].y)+"\n")
+			SendPacket(c, "PLCB "+strconv.Itoa(pls[youID].x+1)+" "+strconv.Itoa(pls[youID].y)+"\n")
 		}
 		if win.JustPressed(pixelgl.KeyLeft) {
-			SendPacket(c, "TILE "+strconv.Itoa(pls[youID].x-1)+" "+strconv.Itoa(pls[youID].y)+"\n")
+			SendPacket(c, "PLCB "+strconv.Itoa(pls[youID].x-1)+" "+strconv.Itoa(pls[youID].y)+"\n")
 		}
 		//selecting slots
 		if win.JustPressed(pixelgl.Key1) {
@@ -217,6 +225,12 @@ func run() {
 			} else {
 				invSpr.Draw(invs, pixel.IM.Moved(pixel.V(float64(x), float64(32))).ScaledXY(pixel.V(float64(x), float64(32)), pixel.V(4, 4)))
 			}
+			switch inventory[selSlot].itype {
+			case 0:
+			
+			case 1:
+				tileSpr.Draw(invTiles, pixel.IM.Moved(pixel.V(float64(x), 32)).ScaledXY(pixel.V(float64(x), 32), pixel.V(2.3, 2.3)))
+			}
 		}
 
 		//drawing everything
@@ -225,6 +239,7 @@ func run() {
 		tiles.Draw(win)
 		yous.Draw(win)
 		invs.Draw(win)
+		invTiles.Draw(win)
 		win.Update()
 
 		frames++ //Fps displaying stuff
@@ -238,7 +253,7 @@ func run() {
 			switch pktType {
 			case "CHAT":
 				fmt.Print(strings.Join(pktData, " "))
-			case "TILE":
+			case "PLCB":
 				x, _ := strconv.Atoi(pktData[0])
 				y, _ := strconv.Atoi(RemoveNewline(pktData[1]))
 				if x >= 20 {
@@ -306,5 +321,5 @@ func run() {
 }
 
 func main() {
-	pixelgl.Run(run) // all the graphics stuff
+	pixelgl.Run(run) // all the graphics stuff (end everything else...)
 }
