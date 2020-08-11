@@ -9,7 +9,7 @@ type ItemStack struct {
 func GiveItem(inv []*ItemStack, ite ItemStack) {
 	iltd:=ItemStack.amnt
 	for i:=0;i!=52;i++ {
-		if inv[i].itype == ite.amnt {
+		if inv[i].itype == ite.itype {
 			isa:=85-inv[i].amnt
 			if iltd>isa {
 				inv[i].amnt=85
@@ -36,8 +36,8 @@ func GiveItem(inv []*ItemStack, ite ItemStack) {
 
 func CleanInv(inv []*ItemStack) {
 	for i:=0;i!=52;i++ {
-		if inventory[i].amnt==0 {
-			inventory[i].itype=0
+		if inv[i].amnt==0 {
+			inv[i].itype=0
 		}
 	}
 }
