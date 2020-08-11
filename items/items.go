@@ -34,7 +34,7 @@ func GiveItem(inv *[]ItemStack, ite ItemStack) {
 	}
 }
 
-func CleanInv(inv *[ItemStack]) {
+func CleanInv(inv *[]ItemStack) {
 	for i:=0;i!=52;i++ {
 		if inventory[i].amnt==0 {
 			inventory[i].itype=0
