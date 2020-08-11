@@ -22,7 +22,7 @@ func GiveItem(inv []*ItemStack, ite ItemStack) {
 	}
 	for i:=0;i!=52;i++ {
 		if inv[i].itype == 0 {
-			if itld>85 {
+			if iltd>85 {
 				inv[i].amnt=85
 				iltd-=85
 			} else {
