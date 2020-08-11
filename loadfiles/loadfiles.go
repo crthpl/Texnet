@@ -9,6 +9,7 @@ import (
 )
 
 func LoadPicture(path string) (pixel.Picture, error) {
+	fmt.Println(osext.ExecutableFolder())
 	path = osext.ExecutableFolder()+"/assets/"+path
 	file, err := os.Open(path)
 	if err != nil {
