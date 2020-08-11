@@ -139,16 +139,16 @@ func run() {
 
 		// all da controls
 		if win.JustPressed(pixelgl.KeyUp) {
-			SendPacket(c, "PLCB "+strconv.Itoa(pls[youID].x)+" "+strconv.Itoa(pls[youID].y+1)+" 0\n")
+			packets.SendPacket(c, "PLCB "+strconv.Itoa(pls[youID].x)+" "+strconv.Itoa(pls[youID].y+1)+" 0\n")
 		}
 		if win.JustPressed(pixelgl.KeyDown) {
-			SendPacket(c, "PLCB "+strconv.Itoa(pls[youID].x)+" "+strconv.Itoa(pls[youID].y-1)+" 0\n")
+			packets.SendPacket(c, "PLCB "+strconv.Itoa(pls[youID].x)+" "+strconv.Itoa(pls[youID].y-1)+" 0\n")
 		}
 		if win.JustPressed(pixelgl.KeyRight) {
-			SendPacket(c, "PLCB "+strconv.Itoa(pls[youID].x+1)+" "+strconv.Itoa(pls[youID].y)+" 0\n")
+			packets.SendPacket(c, "PLCB "+strconv.Itoa(pls[youID].x+1)+" "+strconv.Itoa(pls[youID].y)+" 0\n")
 		}
 		if win.JustPressed(pixelgl.KeyLeft) {
-			SendPacket(c, "PLCB "+strconv.Itoa(pls[youID].x-1)+" "+strconv.Itoa(pls[youID].y)+" 0\n")
+			packets.SendPacket(c, "PLCB "+strconv.Itoa(pls[youID].x-1)+" "+strconv.Itoa(pls[youID].y)+" 0\n")
 		}
 		//selecting slots
 		if win.JustPressed(pixelgl.Key1) {
@@ -173,7 +173,7 @@ func run() {
 			packets.SendPacket(c, "SLSL 6 " + strconv.Itoa(youID) + "\n")
 		}
 		if win.JustPressed(pixelgl.Key8) {
-			packets.packets.SendPacket(c, "SLSL 7 " + strconv.Itoa(youID) + "\n")
+			packets.SendPacket(c, "SLSL 7 " + strconv.Itoa(youID) + "\n")
 		}
 		if win.JustPressed(pixelgl.Key9) {
 			packets.SendPacket(c, "SLSL 8 " + strconv.Itoa(youID) + "\n")
@@ -272,7 +272,7 @@ func run() {
 			case "PLCB": //someone placed a block (Position)
 				x, _ := strconv.Atoi(pktData[0])
 				y, _ := strconv.Atoi(pktData[1])
-				ini, _ := strconv.Atoi(RemoveNewline(pktData[2]))
+				ini, _ := strconv.Atoi(packets.RemoveNewline(pktData[2]))
 				if inventory[selSlot].amnt != 0 {
 					dis:=false
 					if x >= 20 {
