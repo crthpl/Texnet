@@ -23,12 +23,6 @@ type Player struct {
 	used bool
 }
 
-type ItemStack struct {
-	amnt int8		//can be at most 85 (legally) and at the least 1
-	itype int32		//allows for four billion different types of items/blocks
-	//nbt string	// unused (for now!)
-}
-
 func loadPicture(path string) (pixel.Picture, error) {
 	file, err := os.Open(path)
 	if err != nil {
@@ -123,7 +117,7 @@ func run() {
 	var youID int
 	randAngles := [4]float64{0, 1.5708, 3.14159, 4.71239}
 	rand.Seed(time.Now().UnixNano())
-	var inv [52]ItemStack	//in order: 10 hotbar slots, 30 inv slots, 4 armor slots, 8 misceloanous bauble slots, 1 error slot
+	var inv [52]items.ItemStack	//in order: 10 hotbar slots, 30 inv slots, 4 armor slots, 8 misceloanous bauble slots, 1 error slot
 	
 	grasses.Clear()
 	for x := 16; x != 656; x += 32 {
@@ -234,7 +228,7 @@ func run() {
 			} else {
 				invSpr.Draw(invs, pixel.IM.Moved(pixel.V(float64(x), float64(32))).ScaledXY(pixel.V(float64(x), float64(32)), pixel.V(4, 4)))
 			}
-			switch inv[(x+32)/64-1].itype {
+			switch inv[(x+32)/64-1].Itype {
 			case 0:
 			case 1:
 				tileSpr.Draw(invTiles, pixel.IM.Moved(pixel.V(float64(x), 32)).ScaledXY(pixel.V(float64(x), 32), pixel.V(2.3, 2.3)))
@@ -270,7 +264,7 @@ func run() {
 				x, _ := strconv.Atoi(pktData[0])
 				y, _ := strconv.Atoi(pktData[1])
 				ini, _ := strconv.Atoi(packets.RemoveNewline(pktData[2]))
-				if inv[selSlot].amnt != 0 {
+				if inv[selSlot].Amnt != 0 {
 					dis:=false
 					if x >= 20 {
 						dis=true
@@ -293,13 +287,13 @@ func run() {
 						case 0:
 							tilePos[x][y] = 1
 							if ini==0 {
-								inv[selSlot].amnt--
+								inv[selSlot].Amnt--
 							}
 						}
 					}
 				} else {
 					if tilePos[x][y]>0&&ini==0 {
-						inv[selSlot].amnt++
+						inv[selSlot].Amnt++
 					}
 				}
 			case "MOVE": //someone moves (direction ID)
@@ -345,8 +339,8 @@ func run() {
 					slot, err := strconv.Atoi(pktData[1])
 					amount, err := strconv.Atoi(pktData[2])
 					itemType, err := strconv.Atoi(packets.RemoveNewline(pktData[3]))
-					inv[slot].amnt = int8(amount)
-					inv[slot].itype = int32(itemType)
+					inv[slot].Amnt = int8(amount)
+					inv[slot].Itype = int32(itemType)
 					if err!=nil {
 						panic(err)
 					}
