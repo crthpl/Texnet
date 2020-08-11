@@ -70,3 +70,42 @@ func SendPacket(c net.Conn, packet string) {
 		panic(err)
 	}
 }
+
+/*
+func main() {
+	incPackets := make(chan string)
+	outPackets := make(chan string)
+
+	c := StartConnection("localhost:6000")
+
+	for {
+		go func(c net.Conn) {
+			for {
+				incoming := RecievePackets(c)
+				incPackets <- fmt.Sprintf(incoming)
+			}
+		}(c)
+
+		go func() {
+			for {
+				outComing := ReadUserInput()
+				outComing = "CHAT " + outComing
+				outPackets <- fmt.Sprintf(outComing)
+			}
+		}()
+		select {
+		case incPacket := <-incPackets:
+			pktType, pktData := DecodePacket(incPacket)
+			switch pktType {
+			case "CHAT":
+				fmt.Println(strings.Join(RemoveNewlines(pktData), " "))
+			case "KICK":
+				os.Exit(10)
+			default:
+
+			}
+		case outPacket := <-outPackets:
+			SendPacket(c, outPacket)
+		}
+	}
+}*/
