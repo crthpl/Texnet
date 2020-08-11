@@ -2,11 +2,7 @@ package packets
 
 import (
 	"bufio"
-	//"fmt"
-	"math"
 	"net"
-	"os"
-	"strings"
 )
 
 func SendChat(c net.Conn, msg string) {
