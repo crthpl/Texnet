@@ -6,6 +6,7 @@ import (
 	"github.com/faiface/pixel/pixelgl"
 	//"github.com/faiface/pixel/text"
 	"github.com/CrazyDiamond88/Texnet/packets"
+	"github.com/CrazyDiamond88/Texnet/items"
 	"golang.org/x/image/colornames"
 	"image"
 	_ "image/png"
@@ -20,12 +21,6 @@ import (
 type Player struct {
 	x, y int
 	used bool
-}
-
-type ItemStack struct {
-	amnt int8		//can be at most 85 (legally) and at the least 1
-	itype int32		//allows for four billion different types of items
-	//nbt string	// unused (for now!)
 }
 
 func loadPicture(path string) (pixel.Picture, error) {
@@ -69,7 +64,7 @@ func run() {
 	grass, err := loadPicture("grass.png")	//loading the grass tile
 	tile, err := loadPicture("wood.png")	//loading the tile tile
 	you, err := loadPicture("you.png")		//loading you
-	inv, err := loadPicture("inv.png")		//loading the inventory hotbar slors
+	inv, err := loadPicture("inv.png")		//loading the inv hotbar slors
 	if err != nil {
 		panic(err)
 	}
@@ -122,7 +117,7 @@ func run() {
 	var youID int
 	randAngles := [4]float64{0, 1.5708, 3.14159, 4.71239}
 	rand.Seed(time.Now().UnixNano())
-	var inventory [52]ItemStack	//in order: 10 hotbar slots, 30 inventory slots, 4 armor slots, 8 misceloanous bauble slots, 1 error slot
+	var inv [52]items.ItemStack	//in order: 10 hotbar slots, 30 inv slots, 4 armor slots, 8 misceloanous bauble slots, 1 error slot
 	
 	grasses.Clear()
 	for x := 16; x != 656; x += 32 {
@@ -233,7 +228,7 @@ func run() {
 			} else {
 				invSpr.Draw(invs, pixel.IM.Moved(pixel.V(float64(x), float64(32))).ScaledXY(pixel.V(float64(x), float64(32)), pixel.V(4, 4)))
 			}
-			switch inventory[(x+32)/64-1].itype {
+			switch inv[(x+32)/64-1].itype {
 			case 0:
 			case 1:
 				tileSpr.Draw(invTiles, pixel.IM.Moved(pixel.V(float64(x), 32)).ScaledXY(pixel.V(float64(x), 32), pixel.V(2.3, 2.3)))
@@ -242,12 +237,8 @@ func run() {
 			}
 		}
 
-		//removing itemStacks with 0 items from the inventory
-		for i:=0;i!=52;i++ {
-			if inventory[i].amnt==0 {
-				inventory[i].itype=0
-			}
-		}
+		//removing itemStacks with 0 items from the inv
+		items.CleanInv(&inv)
 
 		//drawing everything
 		win.Clear(colornames.Forestgreen)
@@ -273,7 +264,7 @@ func run() {
 				x, _ := strconv.Atoi(pktData[0])
 				y, _ := strconv.Atoi(pktData[1])
 				ini, _ := strconv.Atoi(packets.RemoveNewline(pktData[2]))
-				if inventory[selSlot].amnt != 0 {
+				if inv[selSlot].amnt != 0 {
 					dis:=false
 					if x >= 20 {
 						dis=true
@@ -292,19 +283,17 @@ func run() {
 						switch tilePos[x][y] {
 						case 1:
 							tilePos[x][y] = 0
-							if ini==0 {
-								inventory[selSlot].amnt++
-							}
+							
 						case 0:
 							tilePos[x][y] = 1
 							if ini==0 {
-								inventory[selSlot].amnt--
+								inv[selSlot].amnt--
 							}
 						}
 					}
 				} else {
-					if tilePos[x][y]>0 {
-						inventory[selSlot].amnt++
+					if tilePos[x][y]>0&&ini=0 {
+						inv[selSlot].amnt++
 					}
 				}
 			case "MOVE": //someone moves (direction ID)
@@ -344,14 +333,14 @@ func run() {
 					panic(err)
 				}
 				pls[id] = Player{0, 0, false}
-			case "INVC": // inventory change (ID, slot, amount, type)
+			case "INVC": // inv change (ID, slot, amount, type)
 				id, err:=strconv.Atoi(pktData[0])
 				if id==youID {
 					slot, err := strconv.Atoi(pktData[1])
 					amount, err := strconv.Atoi(pktData[2])
 					itemType, err := strconv.Atoi(packets.RemoveNewline(pktData[3]))
-					inventory[slot].amnt = int8(amount)
-					inventory[slot].itype = int32(itemType)
+					inv[slot].amnt = int8(amount)
+					inv[slot].itype = int32(itemType)
 					if err!=nil {
 						panic(err)
 					}
