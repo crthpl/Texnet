@@ -279,7 +279,7 @@ func run() {
 							if ini==0 {
 								items.GiveItem(&inv, items.ItemStack{1, 1})
 								fmt.Println(inv)
-							}`
+							}
 						case 0:
 							tilePos[x][y] = 1
 							if ini==0 {
