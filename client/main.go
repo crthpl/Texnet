@@ -71,8 +71,8 @@ func run() {
 		panic(err)
 	}
 	atlas := text.NewAtlas(face, []rune{'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'})
-	basicTxt := text.New(pixel.V(30, 10), atlas)
-	fmt.Fprintln(basicTxt, "123456789")
+	basicTxt := text.New(pixel.V(40, 10), atlas)
+	fmt.Fprintln(basicTxt, "1")
 
 
 
@@ -118,10 +118,7 @@ func run() {
 			grassSpr.Draw(grasses, pixel.IM.Moved(pixel.V(float64(x), float64(y))).ScaledXY(pixel.V(float64(x), float64(y)), pixel.V(2, 2)).Rotated(pixel.V(float64(x), float64(y)), randAngles[rand.Intn(3)]))
 		}
 	}
-	//last := time.Now()
 	for !win.Closed() {
-		//dt := time.Since(last).Seconds()
-		//last = time.Now()
 
 		// all da controls
 		if win.JustPressed(pixelgl.KeyUp) {
@@ -211,20 +208,25 @@ func run() {
 				youSpr.Draw(yous, pixel.IM.Moved(pixel.V(float64(pls[x].x*32)+8, float64(pls[x].y*32)+40)).ScaledXY(pixel.V(float64(pls[x].x*32), float64(pls[x].y*32)), pixel.V(2, 2)))
 			}
 		}
+		win.Clear(colornames.Forestgreen)
 		invs.Clear()
 		invTiles.Clear()
 		for x := 32; x != 672; x += 64 {
-			if (x+32)/64==selSlot+1 {
+			curSlot := (x+32)/64-1
+			if curSlot==selSlot {
 				invSpr.Draw(invs, pixel.IM.Moved(pixel.V(float64(x), float64(32))).ScaledXY(pixel.V(float64(x), float64(32)), pixel.V(4.6, 4.6)))
 			} else {
 				invSpr.Draw(invs, pixel.IM.Moved(pixel.V(float64(x), float64(32))).ScaledXY(pixel.V(float64(x), float64(32)), pixel.V(4, 4)))
 			}
-			switch inv[(x+32)/64-1].Itype {
+			switch inv[curSlot].Itype {
 			case 0:
 			case 1:
 				tileSpr.Draw(invTiles, pixel.IM.Moved(pixel.V(float64(x), 32)).ScaledXY(pixel.V(float64(x), 32), pixel.V(2.3, 2.3)))
+				if inv[curSlot].Amnt<1 {
+					fmt.Fprintln(basicTxt, inv[curSlot].Amnt)
+					basicTxt.WriteRune(rune(inv[curSlot].Amnt))
+				}
 			default:
-				//fmt.Println(in(x+32)/64-1)
 			}
 		}
 
@@ -232,13 +234,11 @@ func run() {
 		inv = items.CleanInv(inv)
 
 		//drawing everything
-		win.Clear(colornames.Forestgreen)
 		grasses.Draw(win)
 		tiles.Draw(win)
 		yous.Draw(win)
 		invs.Draw(win)
 		invTiles.Draw(win)
-		basicTxt.Draw(win, pixel.IM.Scaled(basicTxt.Orig, 2))
 		win.Update()
 		
 
@@ -276,7 +276,10 @@ func run() {
 						switch tilePos[x][y] {
 						case 1:
 							tilePos[x][y] = 0
-							
+							if ini==0 {
+								items.GiveItem(&inv, items.ItemStack{1, 1})
+								fmt.Println(inv)
+							}`
 						case 0:
 							tilePos[x][y] = 1
 							if ini==0 {
@@ -286,7 +289,7 @@ func run() {
 					}
 				} else {
 					if tilePos[x][y]>0&&ini==0 {
-						inv[selSlot].Amnt++
+						items.GiveItem(&inv, items.ItemStack{1, 1})
 					}
 				}
 			case "MOVE": //someone moves (direction ID)
